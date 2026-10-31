@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta content="width=device-width, initial-scale=1" name="viewport" />
+<title>Liquid Glass Chat - RutonyChat Theme</title>
+
+<!-- External Stylesheets (RutonyChat base) -->
+<link href="chat.css" rel="stylesheet" type="text/css" />
+<link href="../perfect-scrollbar.min.css" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="../animate.css">
+
+<!-- Scripts with automatic fallback -->
+<script src="../jquery.min.js"></script>
+<script>
+	if (typeof window.jQuery === 'undefined') {
+		document.write('<script src="https://code.jquery.com/jquery-3.7.1.min.js"><\/script>');
+	}
+</script>
+<script src="../jquery.tmpl.js"></script>
+<script>
+	if (typeof window.jQuery !== 'undefined' && typeof window.jQuery.tmpl === 'undefined') {
+		document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-templates/beta1/jquery.tmpl.min.js"><\/script>');
+	}
+</script>
+<script src="../extended_methods.js"></script>
+<script src="../perfect-scrollbar.jquery.min.js"></script>
+
+<script type="text/javascript">
+	// =========================================================================
+	// RutonyChat Theme Engine - Liquid Glass
+	// Ultra-Modern Frosted Glassmorphism with Fluid Caustic Refractions
+	// =========================================================================
+
+	var themeIndex = "lequid";
+	var autoScroll = true;
+
+	// Configuration defaults
+	var glassStyle      = "liquid-obsidian";
+	var glassTintBg     = "#0b111e";
+	var glassOpacity    = 75;
+	var glassBlur       = 16;
+	var borderRadius    = 18;
+	var enableShimmer   = true;
+	var accentColor     = "#38bdf8";
+
+	var fNick           = { name: "Outfit", size: 16 };
+	var cNick           = "#7dd3fc";
+	var nicknameBold    = true;
+	var userNickColor   = true;
+
+	var fText           = { name: "Inter", size: 15 };
+	var cText           = "#f8fafc";
+	var cReply          = "#fbbf24";
+	var cAlert          = "#f43f5e";
+	var cLink           = "#38bdf8";
+	var textShadow      = true;
+
+	var showAvatars     = true;
+	var avatarSize      = 36;
+	var avatarSquircle  = true;
+	var showSiteIcons   = true;
+	var showBadges      = true;
+	var showTimestamp   = false;
+
+	var qtyMessages     = 8;
+	var qtyAllMessages  = 250;
+	var timeNewMessage  = 18000;
+	var hideMessages    = true;
+
+	// Platform branding colors for dynamic liquid edge glow
+	var SITE_COLORS = {
+		twitch: '#9146FF',
+		youtube: '#FF0033',
+		youtube_moderator: '#FF0033',
+		youtube_subscriber: '#FF0033',
+		kick: '#53FC18',
+		vkplay: '#0A84FF',
+		vkplaylive: '#0A84FF',
+		vkontakte: '#0077FF',
+		vk: '#0077FF',
+		trovo: '#19E6C8',
+		wtv: '#A855F7',
+		tiktok: '#00F2FE',
+		goodgame: '#7BC043',
+		discord: '#5865F2',
+		telegram: '#2AABEE',
+		tg: '#2AABEE',
+		wasd: '#E4405F',
+		rutube: '#FF3300',
+		nuum: '#A855F7',
+		steam: '#66C0F4',
+		donationalerts: '#F4A261',
+		donatestream: '#FF7043',
+		donatty: '#2B6CB0',
+		tonady: '#FF4567',
+		cloudtips: '#00D68F',
+		memalerts: '#FFAA00',
+		lava: '#7928CA',
+		yoomoney: '#8038A6'
+	};
+
+	// -------------------------------------------------------------------------
+	// Utility Helpers
+	// -------------------------------------------------------------------------
+	function hexToRgb(hex) {
+		if (!hex) return "11, 17, 30";
+		hex = hex.replace('#', '').trim();
+		if (hex.length === 3) hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+		var n = parseInt(hex, 16);
+		if (isNaN(n)) return "11, 17, 30";
+		return ((n >> 16) & 255) + ", " + ((n >> 8) & 255) + ", " + (n & 255);
+	}
+
+	function hexToRgbaString(hex, alpha) {
+		var rgb = hexToRgb(hex);
+		return 'rgba(' + rgb + ', ' + alpha + ')';
+	}
+
+	function escapeHtml(text) {
+		if (!text) return '';
+		return String(text)
+			.replace(/&/g, '&amp;')
+			.replace(/</g, '&lt;')
+			.replace(/>/g, '&gt;')
+			.replace(/"/g, '&quot;')
+			.replace(/'/g, '&#039;');
+	}
+
+	function safeUrl(u) {
+		if (!u) return null;
+		u = String(u).replace(/["'<>]/g, '').trim();
+		if (/^(javascript|vbscript|data:(?!image\/)):/i.test(u)) return null;
+		if (/^(https?:\/\/|\/|\.\/|\.\.\/|data:image\/|file:\/\/\/)/i.test(u)) return u;
+		if (/^[a-zA-Z0-9_\-./]+\.(png|jpg|jpeg|gif|webp|svg)/i.test(u)) return u;
+		return null;
+	}
+
+	// -------------------------------------------------------------------------
+	// Settings & Initialization from RutonyChat
+	// -------------------------------------------------------------------------
+	function InitParams(data) {
+		if (!data) return;
+		if (typeof data === "string") {
+			try { data = JSON.parse(data); } catch(e) { return; }
+		}
+		if (data.themeIndex && 
+			data.themeIndex.toLowerCase() !== "lequid" && 
+			data.themeIndex.toLowerCase() !== "liquid" && 
+			data.themeIndex.toLowerCase() !== "liquid glass" && 
+			data.themeIndex.toLowerCase() !== themeIndex.toLowerCase()) {
+			return;
+		}
+
+		glassStyle     = data.GlassStyle || glassStyle;
+		glassTintBg    = data.GlassTintBg || glassTintBg;
+		if (data.GlassOpacity != null) glassOpacity = Math.max(0, Math.min(100, parseInt(data.GlassOpacity, 10)));
+		if (data.GlassBlur != null) glassBlur = Math.max(0, Math.min(40, parseInt(data.GlassBlur, 10)));
+		if (data.BorderRadius != null) borderRadius = Math.max(4, Math.min(40, parseInt(data.BorderRadius, 10)));
+		enableShimmer  = (data.EnableShimmer == null) ? enableShimmer : !!data.EnableShimmer;
+		accentColor    = data.AccentColor || accentColor;
+
+		if (data.FontNickname) fNick = data.FontNickname;
+		cNick          = data.NicknameColor || cNick;
+		nicknameBold   = (data.NicknameBold == null) ? nicknameBold : !!data.NicknameBold;
+		userNickColor  = (data.UserNickColor == null) ? userNickColor : !!data.UserNickColor;
+
+		if (data.FontText) fText = data.FontText;
+		cText          = data.TextColor || cText;
+		cReply         = data.ReplyColor || cReply;
+		cAlert         = data.AlertColor || cAlert;
+		cLink          = data.LinksColor || cLink;
+		textShadow     = (data.TextShadow == null) ? textShadow : !!data.TextShadow;
+
+		showAvatars    = (data.ShowAvatars == null) ? showAvatars : !!data.ShowAvatars;
+		if (data.AvatarSize != null) avatarSize = Math.max(16, Math.min(64, parseInt(data.AvatarSize, 10)));
+		avatarSquircle = (data.AvatarSquircle == null) ? avatarSquircle : !!data.AvatarSquircle;
+		showSiteIcons  = (data.ShowSiteIcons == null) ? showSiteIcons : !!data.ShowSiteIcons;
+		showBadges     = (data.ShowBadges == null) ? showBadges : !!data.ShowBadges;
+		showTimestamp  = (data.ShowTimestamp == null) ? showTimestamp : !!data.ShowTimestamp;
+
+		qtyMessages    = parseInt(data.QtyMessages, 10) || qtyMessages;
+		timeNewMessage = ((data.TimeNewMessages != null) ? parseInt(data.TimeNewMessages, 10) : 18) * 1000;
+		hideMessages   = (data.HideMessages == null) ? hideMessages : !!data.HideMessages;
+
+		applyThemeProperties();
+	}
+
+	function applyThemeProperties() {
+		var root = document.documentElement;
+
+		root.style.setProperty('--glass-tint-raw', hexToRgb(glassTintBg));
+		root.style.setProperty('--glass-opacity', (glassOpacity / 100).toFixed(2));
+		root.style.setProperty('--glass-blur', glassBlur + 'px');
+		root.style.setProperty('--card-radius', borderRadius + 'px');
+		root.style.setProperty('--accent-color', accentColor);
+		root.style.setProperty('--accent-glow', hexToRgbaString(accentColor, 0.28));
+
+		var nickFontName = fNick && fNick.name ? fNick.name : 'Outfit';
+		var textFontName = fText && fText.name ? fText.name : 'Inter';
+		root.style.setProperty('--font-nick', '"' + nickFontName.replace(/["']/g, '') + '", "Outfit", "Plus Jakarta Sans", "Inter", sans-serif');
+		root.style.setProperty('--nick-size', (fNick && fNick.size ? fNick.size : 16) + 'px');
+		root.style.setProperty('--font-text', '"' + textFontName.replace(/["']/g, '') + '", "Inter", "Plus Jakarta Sans", sans-serif');
+		root.style.setProperty('--text-size', (fText && fText.size ? fText.size : 15) + 'px');
+
+		root.style.setProperty('--nick-color', cNick);
+		root.style.setProperty('--text-color', cText);
+		root.style.setProperty('--reply-color', cReply);
+		root.style.setProperty('--alert-color', cAlert);
+		root.style.setProperty('--link-color', cLink);
+
+		root.style.setProperty('--avatar-size', avatarSize + 'px');
+		root.style.setProperty('--avatar-radius', avatarSquircle ? Math.round(avatarSize * 0.38) + 'px' : '50%');
+
+		var sh = textShadow ? '0 1px 2px rgba(0, 0, 0, 0.95), 0 2px 8px rgba(0, 0, 0, 0.7)' : 'none';
+		root.style.setProperty('--text-shadow', sh);
+
+		if (enableShimmer) {
+			$('body').addClass('enable-shimmer');
+		} else {
+			$('body').removeClass('enable-shimmer');
+		}
+
+		// Update visibility of existing elements
+		$('.av').css('display', showAvatars ? '' : 'none');
+		$('.site').css('display', showSiteIcons ? '' : 'none');
+		$('.badges').css('display', showBadges ? '' : 'none');
+		$('.timestamp').css('display', showTimestamp ? '' : 'none');
+
+		// Sync demo selector if visible
+		$('#demo-style-select').val(glassStyle);
+	}
+
+	// -------------------------------------------------------------------------
+	// W.TV Bridge Support
+	// -------------------------------------------------------------------------
+	var WTV_MARK = '\u200Dwtv\u200D';
+	function unpackWtv(user) {
+		if (!user) return { name: '', wtv: false };
+		if (user.indexOf(WTV_MARK) >= 0) {
+			return { name: user.split(WTV_MARK).join(''), wtv: true };
+		}
+		return { name: user, wtv: false };
+	}
+
+	// -------------------------------------------------------------------------
+	// Fluid Avatar Generation with Monogram Fallback
+	// -------------------------------------------------------------------------
+	var LIQUID_GRADIENTS = [
+		'linear-gradient(135deg, #0ea5e9, #38bdf8)',
+		'linear-gradient(135deg, #6366f1, #a855f7)',
+		'linear-gradient(135deg, #10b981, #06b6d4)',
+		'linear-gradient(135deg, #f43f5e, #fb923c)',
+		'linear-gradient(135deg, #ec4899, #8b5cf6)',
+		'linear-gradient(135deg, #84cc16, #10b981)',
+		'linear-gradient(135deg, #f59e0b, #ef4444)',
+		'linear-gradient(135deg, #14b8a6, #0284c7)'
+	];
+
+	function getInitialBg(str) {
+		if (!str) return LIQUID_GRADIENTS[0];
+		var hash = 0;
+		for (var i = 0; i < str.length; i++) {
+			hash = str.charCodeAt(i) + ((hash << 5) - hash);
+		}
+		var index = Math.abs(hash) % LIQUID_GRADIENTS.length;
+		return LIQUID_GRADIENTS[index];
+	}
+
+	function buildAvatar(obj) {
+		if (!showAvatars) return '';
+		var url = safeUrl(obj.user_avatar);
+		var cleanUser = (obj.user || '?').replace(/<[^>]*>/g, '').trim();
+		var initial = escapeHtml(cleanUser.charAt(0).toUpperCase() || '?');
+		var bgGradient = (obj.color_nick && obj.color_nick.trim() !== '')
+			? ('linear-gradient(135deg, ' + obj.color_nick + ', #0b111e)')
+			: getInitialBg(cleanUser);
+
+		if (url) {
+			return '<div class="av-box">' +
+				'<img class="av-img" src="' + url + '" alt="" onerror="this.style.display=\'none\'; this.nextElementSibling.style.display=\'flex\';" />' +
+				'<span class="av-fallback" style="display:none; background:' + bgGradient + '">' + initial + '</span>' +
+			'</div>';
+		}
+		return '<div class="av-box"><span class="av-fallback" style="background:' + bgGradient + '">' + initial + '</span></div>';
+	}
+
+	// -------------------------------------------------------------------------
+	// Platform Badges Decoration with Fluid Glass Capsules
+	// -------------------------------------------------------------------------
+	function decorateSites(el) {
+		if (!el) return;
+		var imgs = $(el).find('.site img');
+		for (var i = 0; i < imgs.length; i++) {
+			var im = imgs[i];
+			var src = (im.getAttribute('src') || '').toLowerCase();
+			var cleanSrc = src.split(/[?#]/)[0];
+			var base = cleanSrc.substring(cleanSrc.lastIndexOf('/') + 1).replace(/\.[a-z0-9]+$/i, '');
+			var key = '';
+
+			if (SITE_COLORS[base]) {
+				key = base;
+			} else {
+				for (var k in SITE_COLORS) {
+					if (base.indexOf(k) >= 0 || src.indexOf('/' + k + '.') >= 0) {
+						key = k;
+						break;
+					}
+				}
+			}
+
+			// Wrap in site-pill for frosted glass capsule container
+			if (!$(im).parent().hasClass('site-pill')) {
+				$(im).wrap('<span class="site-pill"></span>');
+			}
+
+			im.className = 'site-icon';
+			if (key) {
+				im.setAttribute('data-platform', key);
+				im.title = key.toUpperCase();
+				var glowColor = SITE_COLORS[key];
+				im.style.filter = 'drop-shadow(0 0 4px ' + glowColor + ')';
+				$(im).parent().css({
+					'border-color': glowColor + '55',
+					'box-shadow': '0 1px 4px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.35), 0 0 8px ' + glowColor + '33'
+				});
+			}
+		}
+	}
+
+	// -------------------------------------------------------------------------
+	// Timestamp Formatter
+	// -------------------------------------------------------------------------
+	function getCurrentTime() {
+		var now = new Date();
+		var hh = String(now.getHours()).padStart(2, '0');
+		var mm = String(now.getMinutes()).padStart(2, '0');
+		return hh + ':' + mm;
+	}
+
+	// -------------------------------------------------------------------------
+	// Message Template Fallback Renderer (if jQuery tmpl is missing)
+	// -------------------------------------------------------------------------
+	function renderMessageHtml(obj) {
+		var html = '<div class="mess k-' + obj.kind + '" style="' + (obj.card_accent_style || '') + '">' +
+			'<div class="av">' + obj.avatar_html + '</div>' +
+			'<div class="mess-content">' +
+				obj.reply_badge_html +
+				obj.alert_badge_html +
+				'<div class="mess-header">' +
+					'<span class="name" style="' + (obj.nick_style || '') + '">' + obj.user + '</span>' +
+					'<span class="badges">' + (obj.rank_img || '') + (obj.spec_img || '') + (obj.sub || '') + (obj.moderator || '') + '</span>' +
+					'<span class="site">' + (obj.site_img || '') + '</span>' +
+					'<span class="timestamp">' + obj.timestamp + '</span>' +
+				'</div>' +
+				'<div class="body">' +
+					'<span class="user_mess" message_id="' + (obj.message_id || '') + '" user_id="' + (obj.user_id || '') + '" style="' + (obj.mess_style || '') + '">' + obj.text + '</span>' +
+				'</div>' +
+			'</div>' +
+		'</div>';
+		return html;
+	}
+
+	// -------------------------------------------------------------------------
+	// RutonyChat Message Ingestion Engine (NewMessage)
+	// -------------------------------------------------------------------------
+	function NewMessage(data) {
+		var obj;
+		try {
+			obj = (typeof data === 'string') ? JSON.parse(data) : data;
+		} catch (e) {
+			return;
+		}
+		if (!obj) return;
+
+		// 1. Clear Chat handler
+		if (obj.clear_chat) {
+			var hasTarget = false;
+			if (obj.message_id) {
+				hasTarget = true;
+				var targetMess = $('.user_mess').filter(function() { return $(this).attr('message_id') == obj.message_id; });
+				if (obj.text) {
+					targetMess.text(obj.text);
+				} else {
+					targetMess.closest('.mess').remove();
+				}
+			}
+			if (obj.user_id) {
+				hasTarget = true;
+				var targetUser = $('.user_mess').filter(function() { return $(this).attr('user_id') == obj.user_id; });
+				if (obj.text) {
+					targetUser.text(obj.text);
+				} else {
+					targetUser.closest('.mess').remove();
+				}
+			}
+			if (!hasTarget) {
+				$('#content').empty();
+			}
+			if (typeof UpdateScroll === 'function') UpdateScroll();
+			return;
+		}
+
+		// 2. Process W.TV tag
+		var w = unpackWtv(obj.user);
+		obj.user = w.name;
+		if (w.wtv && (!obj.site_img || obj.site_img === '')) {
+			obj.site_img = '<img src="images/wtv.png">';
+		}
+
+		// 3. Build Liquid Avatar
+		obj.avatar_html = buildAvatar(obj);
+
+		// 4. Determine Card Kind
+		obj.kind = (obj.type === 'alert') ? 'alert'
+		         : (obj.reply == 1)       ? 'reply'
+		         : (obj.type === 'system')? 'system'
+		         : 'normal';
+
+		// 5. Liquid Capsule Badges
+		obj.reply_badge_html = (obj.kind === 'reply')
+			? '<div class="reply-badge-pill"><svg viewBox="0 0 24 24"><path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/></svg>Ответ</div>'
+			: '';
+
+		obj.alert_badge_html = (obj.kind === 'alert')
+			? '<div class="alert-badge-pill">★ Событие / Донат</div>'
+			: '';
+
+		// 6. Nickname Styles
+		var displayNickColor = '';
+		if (userNickColor && obj.color_nick && obj.color_nick.trim() !== '') {
+			displayNickColor = 'color:' + obj.color_nick + ';';
+		}
+		displayNickColor += nicknameBold ? 'font-weight: 700;' : 'font-weight: 500;';
+		obj.nick_style = displayNickColor;
+
+		// 7. Dynamic Liquid Border Accent
+		var cardAccentStyle = '';
+		if (obj.kind === 'normal' && userNickColor && obj.color_nick && obj.color_nick.trim() !== '') {
+			cardAccentStyle = '--accent-color:' + obj.color_nick + '; border-left-color:' + obj.color_nick + '; --accent-glow:' + hexToRgbaString(obj.color_nick, 0.3) + ';';
+		}
+		obj.card_accent_style = cardAccentStyle;
+
+		// 8. Message Text Custom Style
+		obj.mess_style = (obj.color_text && obj.color_text.trim() !== '') ? ('color:' + obj.color_text) : '';
+
+		// 9. Timestamp
+		obj.timestamp = getCurrentTime();
+
+		// 10. Append to DOM
+		var el;
+		if (typeof $.tmpl === 'function' && $('#message_template').length) {
+			$('#content').append($('#message_template').tmpl(obj));
+			el = $('#content').children('.mess').last();
+		} else {
+			var rendered = renderMessageHtml(obj);
+			$('#content').append(rendered);
+			el = $('#content').children('.mess').last();
+		}
+
+		// Apply Glass Style Preset & Shimmer Effect
+		el.addClass('style-' + glassStyle);
+		el.addClass('m-in');
+		if (enableShimmer) el.addClass('has-shimmer');
+
+		decorateSites(el);
+
+		// Visibility flags
+		if (!showAvatars) el.find('.av').hide();
+		if (!showSiteIcons) el.find('.site').hide();
+		if (!showBadges) el.find('.badges').hide();
+		if (!showTimestamp) el.find('.timestamp').hide();
+
+		// Auto-hide Timer
+		if (hideMessages) {
+			setTimeout(function() {
+				el.addClass('m-out');
+				setTimeout(function() {
+					el.detach();
+					if (typeof UpdateScroll === 'function') UpdateScroll();
+				}, 430);
+			}, timeNewMessage);
+		}
+
+		// Message Capacity Limitation
+		if (!hideMessages) {
+			while ($('.mess').length > qtyMessages) {
+				$('.mess:first').detach();
+			}
+		} else {
+			var active = $('.mess:not(.m-out)');
+			if (active.length > qtyMessages) {
+				var old = active.first();
+				old.addClass('m-out');
+				setTimeout(function() {
+					old.detach();
+					if (typeof UpdateScroll === 'function') UpdateScroll();
+				}, 260);
+			}
+			if ($('.mess').length > qtyAllMessages) {
+				$('.mess:first').detach();
+			}
+		}
+
+		// Auto Scroll
+		if (typeof UpdateScroll === 'function') {
+			UpdateScroll();
+		} else {
+			var chat = document.getElementById('chat-wrapper');
+			if (chat) chat.scrollTop = chat.scrollHeight;
+		}
+	}
+
+	// -------------------------------------------------------------------------
+	// Standalone Preview Simulator & Live Testing
+	// -------------------------------------------------------------------------
+	var demoStreamInterval = null;
+
+	var SAMPLE_USERS = [
+		{ name: "LiquidFox", avatar: "https://i.pravatar.cc/80?img=11", site: "images/twitch.png", nickColor: "#9146FF", badges: "images/sub.png" },
+		{ name: "Aqua_Gamer", avatar: "https://i.pravatar.cc/80?img=12", site: "images/kick.png", nickColor: "#53FC18", badges: "" },
+		{ name: "CyberVibe", avatar: "https://i.pravatar.cc/80?img=5", site: "images/youtube.png", nickColor: "#FF0033", badges: "" },
+		{ name: "Elena_Stream", avatar: "https://i.pravatar.cc/80?img=23", site: "images/vkplay.png", nickColor: "#0A84FF", badges: "images/sub.png" },
+		{ name: "FrostBite", avatar: "", site: "images/trovo.png", nickColor: "#19E6C8", badges: "" },
+		{ name: "CrystalQueen", avatar: "https://i.pravatar.cc/80?img=33", site: "images/wtv.png", nickColor: "#A855F7", badges: "" },
+		{ name: "GhostRider", avatar: "", site: "images/discord.png", nickColor: "#F43F5E", badges: "" }
+	];
+
+	var SAMPLE_TEXTS = [
+		"Привет стример! Этот Liquid Glass чат выглядит невероятно круто и современно! ✨💧",
+		"Какая сочная анимация появления и стеклянный блик! Чистый кайф 😍",
+		"Осторожно слева за углом, там засада!",
+		"Наконец-то тема с идеальной читаемостью на любом игровом фоне 🔥",
+		"Подписался на канал! Жду продолжения прохождения",
+		"LUL вот это реакция века конечно, я выпал 😂",
+		"Какой билд сейчас собираешь? Попробуй через криты!"
+	];
+
+	function sendSampleMessage(kind) {
+		var u = SAMPLE_USERS[Math.floor(Math.random() * SAMPLE_USERS.length)];
+		var t = SAMPLE_TEXTS[Math.floor(Math.random() * SAMPLE_TEXTS.length)];
+
+		var msg = {
+			user: u.name,
+			text: t,
+			user_avatar: u.avatar,
+			color_nick: u.nickColor,
+			site_img: u.site ? '<img src="' + u.site + '">' : '',
+			sub: u.badges ? '<img src="' + u.badges + '">' : '',
+			rank_img: '',
+			spec_img: '',
+			moderator: '',
+			reply: (kind === 'reply') ? 1 : 0,
+			type: (kind === 'alert') ? 'alert' : 'normal',
+			message_id: 'sample_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
+			user_id: 'user_' + Math.floor(Math.random() * 100)
+		};
+
+		if (kind === 'alert') {
+			msg.user = "DonationAlerts";
+			msg.text = "<b>Артем</b> задонатил <b>1 000 ₽</b>: <i>«Спасибо за топовый стрим и классную атмосферу! Тема чата просто пушка!»</i>";
+			msg.site_img = '<img src="images/donationalerts.png">';
+			msg.color_nick = "#f4a261";
+			msg.user_avatar = "";
+		}
+
+		NewMessage(msg);
+	}
+
+	function toggleDemoStream(btn) {
+		if (demoStreamInterval) {
+			clearInterval(demoStreamInterval);
+			demoStreamInterval = null;
+			$(btn).removeClass('active').text('▶ Авто-поток');
+		} else {
+			sendSampleMessage('normal');
+			demoStreamInterval = setInterval(function() {
+				var r = Math.random();
+				if (r < 0.15) {
+					sendSampleMessage('alert');
+				} else if (r < 0.35) {
+					sendSampleMessage('reply');
+				} else {
+					sendSampleMessage('normal');
+				}
+			}, 2800);
+			$(btn).addClass('active').text('⏸ Стоп поток');
+		}
+	}
+
+	function changeDemoStyle(style) {
+		glassStyle = style;
+		$('.mess').each(function() {
+			$(this).removeClass('style-liquid-obsidian style-liquid-crystal style-liquid-aurora style-liquid-ocean style-liquid-sunset style-liquid-minimal');
+			$(this).addClass('style-' + glassStyle);
+		});
+	}
+
+	// -------------------------------------------------------------------------
+	// Document Ready
+	// -------------------------------------------------------------------------
+	$(document).ready(function() {
+		applyThemeProperties();
+
+		if (typeof SetAutoScrollPerfect === 'function') {
+			try { SetAutoScrollPerfect(); } catch(e) {}
+		}
+		if (typeof SetSocket === 'function') {
+			try { SetSocket(); } catch(e) {}
+		}
+
+		// Detect if running in RutonyChat or standalone browser
+		var isRutony = (window.location.protocol === 'file:' && window.location.host === '')
+			? false
+			: (window.location.port === '8383' || window.location.search.indexOf('rutony') >= 0);
+
+		if (isRutony) {
+			$('#demo-bar').addClass('hidden');
+		} else {
+			// Welcoming messages in preview
+			setTimeout(function() {
+				sendSampleMessage('normal');
+				setTimeout(function() { sendSampleMessage('reply'); }, 500);
+				setTimeout(function() { sendSampleMessage('alert'); }, 1100);
+			}, 400);
+		}
+
+		// Keyboard shortcut 'D' or '~' to toggle demo toolbar
+		$(document).on('keydown', function(e) {
+			if (e.key === 'd' || e.key === 'D' || e.key === '`' || e.key === 'ё' || e.key === 'Ё') {
+				$('#demo-bar').toggleClass('hidden');
+			}
+		});
+	});
+
+</script>
+
+<!-- jQuery tmpl Template -->
+<script id="message_template" type="text/x-jquery-tmpl">
+<div class="mess k-${kind}" style="${card_accent_style}">
+	<div class="av">${avatar_html}</div>
+	<div class="mess-content">
+		${reply_badge_html}
+		${alert_badge_html}
+		<div class="mess-header">
+			<span class="name" style="${nick_style}">${user}</span>
+			<span class="badges">${rank_img}${spec_img}${sub}${moderator}</span>
+			<span class="site">${site_img}</span>
+			<span class="timestamp">${timestamp}</span>
+		</div>
+		<div class="body">
+			<span class="user_mess" message_id="${message_id}" user_id="${user_id}" style="${mess_style}">${text}</span>
+		</div>
+	</div>
+</div>
+</script>
+
+</head>
+<body>
+
+<!-- Standalone Browser Interactive Testing Bar -->
+<div id="demo-bar">
+	<span class="demo-title">
+		<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+			<path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
+		</svg>
+		Liquid Glass
+	</span>
+	<button class="demo-btn" onclick="sendSampleMessage('normal')">💬 Обычное</button>
+	<button class="demo-btn" onclick="sendSampleMessage('reply')">↩ Ответ</button>
+	<button class="demo-btn" onclick="sendSampleMessage('alert')">⭐ Донат</button>
+	<button class="demo-btn" onclick="toggleDemoStream(this)">▶ Авто-поток</button>
+	
+	<select id="demo-style-select" class="demo-select" onchange="changeDemoStyle(this.value)">
+		<option value="liquid-obsidian">Obsidian (Темный)</option>
+		<option value="liquid-crystal">Crystal (Кристалл)</option>
+		<option value="liquid-aurora">Aurora (Аврора)</option>
+		<option value="liquid-ocean">Ocean (Океан)</option>
+		<option value="liquid-sunset">Sunset (Закат)</option>
+		<option value="liquid-minimal">Minimal (Минимал)</option>
+	</select>
+
+	<button class="demo-close" title="Скрыть панель (нажмите D или Ё чтобы вернуть)" onclick="$('#demo-bar').addClass('hidden')">✕</button>
+</div>
+
+<!-- Chat Messages Container -->
+<div id="chat-wrapper" class="nano">
+	<div class="nano-content" id="content"></div>
+</div>
+<div id="bottom"></div>
+
+</body>
+</html>

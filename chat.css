@@ -1,0 +1,699 @@
+@charset "utf-8";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
+
+/* ==========================================================================
+   Liquid Glass Theme for RutonyChat
+   Ultra-Modern Liquid Glassmorphism • Specular Refraction • Fluid Caustics
+   ========================================================================== */
+
+:root {
+	--font-nick: 'Outfit', 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+	--font-text: 'Inter', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+	--nick-size: 16px;
+	--text-size: 15px;
+	--nick-color: #7dd3fc;
+	--text-color: #f8fafc;
+	--reply-color: #fbbf24;
+	--alert-color: #f43f5e;
+	--link-color: #38bdf8;
+	--accent-color: #38bdf8;
+	--accent-glow: rgba(56, 189, 248, 0.28);
+	--card-radius: 18px;
+	--glass-tint-raw: 11, 17, 30;
+	--glass-opacity: 0.75;
+	--glass-blur: 16px;
+	--avatar-size: 36px;
+	--avatar-radius: 14px;
+	--text-shadow: 0 1px 2px rgba(0, 0, 0, 0.95), 0 2px 8px rgba(0, 0, 0, 0.7);
+}
+
+html, body {
+	background-color: transparent;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+	width: 100%;
+	height: 100%;
+	font-family: var(--font-text);
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+::-webkit-scrollbar {
+	width: 0px;
+	height: 0px;
+	background: transparent;
+}
+
+/* ==========================================================================
+   Chat Outer Wrapper
+   ========================================================================== */
+#chat-wrapper {
+	position: relative;
+	overflow: auto;
+	height: 100%;
+	width: 100%;
+	box-sizing: border-box;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
+}
+
+#content {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	padding: 16px;
+	box-sizing: border-box;
+	width: 100%;
+	max-width: 100%;
+}
+
+/* ==========================================================================
+   Liquid Glass Message Card Core
+   ========================================================================== */
+.mess {
+	position: relative;
+	display: flex;
+	align-items: flex-start;
+	gap: 12px;
+	padding: 10px 14px 11px 14px;
+	border-radius: var(--card-radius);
+	word-break: break-word;
+	box-sizing: border-box;
+	overflow: hidden;
+	isolation: isolate;
+	transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease, max-height 0.3s ease;
+}
+
+/* --------------------------------------------------------------------------
+   Liquid Caustic Light Sheen (Shimmer Reflection)
+   -------------------------------------------------------------------------- */
+.enable-shimmer .mess::after,
+.mess.has-shimmer::after {
+	content: '';
+	position: absolute;
+	top: -60%;
+	left: -100%;
+	width: 250%;
+	height: 220%;
+	background: linear-gradient(
+		115deg,
+		transparent 25%,
+		rgba(255, 255, 255, 0.08) 42%,
+		rgba(255, 255, 255, 0.28) 50%,
+		rgba(255, 255, 255, 0.08) 58%,
+		transparent 75%
+	);
+	transform: rotate(20deg);
+	pointer-events: none;
+	z-index: 1;
+	animation: liquid-sheen 1.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes liquid-sheen {
+	0% {
+		transform: translateX(-80%) rotate(20deg);
+		opacity: 0;
+	}
+	15% {
+		opacity: 1;
+	}
+	80% {
+		opacity: 0.8;
+	}
+	100% {
+		transform: translateX(85%) rotate(20deg);
+		opacity: 0;
+	}
+}
+
+/* --------------------------------------------------------------------------
+   Liquid Glass Style Presets
+   -------------------------------------------------------------------------- */
+
+/* 1. Liquid Obsidian (Default dark smoked glass) */
+.style-liquid-obsidian {
+	background: linear-gradient(
+		135deg,
+		rgba(var(--glass-tint-raw), calc(var(--glass-opacity) * 0.92)) 0%,
+		rgba(var(--glass-tint-raw), calc(var(--glass-opacity) * 1.08)) 100%
+	);
+	-webkit-backdrop-filter: blur(var(--glass-blur)) saturate(190%) contrast(105%);
+	backdrop-filter: blur(var(--glass-blur)) saturate(190%) contrast(105%);
+	border: 1px solid rgba(255, 255, 255, 0.16);
+	border-top: 1.2px solid rgba(255, 255, 255, 0.38);
+	border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+	border-left: 3.5px solid var(--accent-color, #38bdf8);
+	box-shadow: 
+		0 8px 28px -4px rgba(0, 0, 0, 0.55),
+		inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.32),
+		inset 0 -1px 1px 0 rgba(255, 255, 255, 0.06),
+		0 0 16px -2px var(--accent-glow, rgba(56, 189, 248, 0.2));
+}
+
+/* 2. Liquid Crystal (Ultra pure water glass) */
+.style-liquid-crystal {
+	background: linear-gradient(
+		135deg,
+		rgba(255, 255, 255, calc(var(--glass-opacity) * 0.22)) 0%,
+		rgba(240, 248, 255, calc(var(--glass-opacity) * 0.12)) 100%
+	);
+	-webkit-backdrop-filter: blur(calc(var(--glass-blur) * 1.1)) saturate(200%) brightness(115%);
+	backdrop-filter: blur(calc(var(--glass-blur) * 1.1)) saturate(200%) brightness(115%);
+	border: 1px solid rgba(255, 255, 255, 0.38);
+	border-top: 1.5px solid rgba(255, 255, 255, 0.65);
+	border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+	border-left: 3.5px solid var(--accent-color, #38bdf8);
+	box-shadow: 
+		0 8px 26px -2px rgba(0, 0, 0, 0.35),
+		inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.6),
+		inset 0 -1px 2px 0 rgba(255, 255, 255, 0.12),
+		0 0 20px -2px rgba(255, 255, 255, 0.25);
+}
+
+/* 3. Liquid Aurora (Shifting iridescent pastel refraction) */
+.style-liquid-aurora {
+	background: linear-gradient(
+		135deg,
+		rgba(168, 85, 247, calc(var(--glass-opacity) * 0.32)) 0%,
+		rgba(56, 189, 248, calc(var(--glass-opacity) * 0.26)) 50%,
+		rgba(236, 72, 153, calc(var(--glass-opacity) * 0.28)) 100%
+	);
+	-webkit-backdrop-filter: blur(var(--glass-blur)) saturate(210%);
+	backdrop-filter: blur(var(--glass-blur)) saturate(210%);
+	border: 1px solid rgba(255, 255, 255, 0.25);
+	border-top: 1.5px solid rgba(255, 255, 255, 0.55);
+	border-bottom: 1px solid rgba(168, 85, 247, 0.2);
+	border-left: 3.5px solid var(--accent-color, #a855f7);
+	box-shadow: 
+		0 10px 32px -4px rgba(15, 7, 28, 0.6),
+		inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.45),
+		inset 0 -1px 2px 0 rgba(236, 72, 153, 0.2),
+		0 0 22px 0 rgba(168, 85, 247, 0.32);
+}
+
+/* 4. Liquid Ocean (Azure fluid glass) */
+.style-liquid-ocean {
+	background: linear-gradient(
+		135deg,
+		rgba(6, 182, 212, calc(var(--glass-opacity) * 0.35)) 0%,
+		rgba(15, 23, 42, calc(var(--glass-opacity) * 0.85)) 100%
+	);
+	-webkit-backdrop-filter: blur(var(--glass-blur)) saturate(200%);
+	backdrop-filter: blur(var(--glass-blur)) saturate(200%);
+	border: 1px solid rgba(34, 211, 238, 0.28);
+	border-top: 1.5px solid rgba(255, 255, 255, 0.5);
+	border-left: 3.5px solid var(--accent-color, #06b6d4);
+	box-shadow: 
+		0 10px 30px -4px rgba(0, 0, 0, 0.6),
+		inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.4),
+		inset 0 -1px 2px 0 rgba(6, 182, 212, 0.2),
+		0 0 20px 0 rgba(6, 182, 212, 0.35);
+}
+
+/* 5. Liquid Sunset (Golden amber & peach nectar fluid) */
+.style-liquid-sunset {
+	background: linear-gradient(
+		135deg,
+		rgba(244, 63, 94, calc(var(--glass-opacity) * 0.32)) 0%,
+		rgba(245, 158, 11, calc(var(--glass-opacity) * 0.22)) 60%,
+		rgba(17, 24, 39, calc(var(--glass-opacity) * 0.85)) 100%
+	);
+	-webkit-backdrop-filter: blur(var(--glass-blur)) saturate(200%);
+	backdrop-filter: blur(var(--glass-blur)) saturate(200%);
+	border: 1px solid rgba(251, 146, 60, 0.28);
+	border-top: 1.5px solid rgba(255, 255, 255, 0.5);
+	border-left: 3.5px solid var(--accent-color, #fb923c);
+	box-shadow: 
+		0 10px 30px -4px rgba(0, 0, 0, 0.6),
+		inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.42),
+		inset 0 -1px 2px 0 rgba(245, 158, 11, 0.2),
+		0 0 20px 0 rgba(251, 146, 60, 0.35);
+}
+
+/* 6. Liquid Minimal (Ultra clean floating droplets) */
+.style-liquid-minimal {
+	background: rgba(var(--glass-tint-raw), calc(var(--glass-opacity) * 0.35));
+	-webkit-backdrop-filter: blur(8px);
+	backdrop-filter: blur(8px);
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	border-left: 3px solid var(--accent-color, #38bdf8);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+	padding: 7px 10px;
+}
+
+/* ==========================================================================
+   Special Message Cards: Reply, Alert, System
+   ========================================================================== */
+
+/* Reply Card */
+.k-reply {
+	--accent-color: var(--reply-color);
+	border-left-color: var(--reply-color) !important;
+	box-shadow: 
+		0 8px 28px -4px rgba(0, 0, 0, 0.55),
+		inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.36),
+		inset 0 -1px 1px 0 rgba(255, 255, 255, 0.06),
+		0 0 18px 0 rgba(251, 191, 36, 0.28) !important;
+}
+
+.reply-badge-pill {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.3px;
+	color: #fff;
+	background: linear-gradient(135deg, rgba(251, 191, 36, 0.35) 0%, rgba(245, 158, 11, 0.2) 100%);
+	-webkit-backdrop-filter: blur(8px);
+	backdrop-filter: blur(8px);
+	border: 1px solid rgba(251, 191, 36, 0.45);
+	border-top: 1px solid rgba(255, 255, 255, 0.5);
+	box-shadow: 0 2px 8px rgba(245, 158, 11, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+	padding: 2px 9px;
+	border-radius: 999px;
+	margin-bottom: 5px;
+	width: fit-content;
+	text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+.reply-badge-pill svg {
+	width: 11px;
+	height: 11px;
+	fill: currentColor;
+}
+
+/* Alert / Event / Donation Card */
+.k-alert {
+	--accent-color: var(--alert-color);
+	border-left-color: var(--alert-color) !important;
+	background: linear-gradient(
+		135deg,
+		rgba(244, 63, 94, 0.3) 0%,
+		rgba(245, 158, 11, 0.22) 50%,
+		rgba(var(--glass-tint-raw), 0.85) 100%
+	) !important;
+	border: 1px solid rgba(244, 63, 94, 0.35) !important;
+	border-top: 1.5px solid rgba(255, 255, 255, 0.6) !important;
+	border-left: 4px solid var(--alert-color) !important;
+	box-shadow: 
+		0 10px 36px -4px rgba(244, 63, 94, 0.35),
+		inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.5),
+		inset 0 -1px 2px 0 rgba(244, 63, 94, 0.2),
+		0 0 24px 0 rgba(244, 63, 94, 0.38) !important;
+}
+
+.alert-badge-pill {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	font-size: 11px;
+	font-weight: 800;
+	letter-spacing: 0.5px;
+	text-transform: uppercase;
+	color: #fff;
+	background: linear-gradient(135deg, #f43f5e 0%, #fb923c 100%);
+	border: 1px solid rgba(255, 255, 255, 0.4);
+	box-shadow: 0 2px 10px rgba(244, 63, 94, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.6);
+	padding: 2px 10px;
+	border-radius: 999px;
+	margin-bottom: 5px;
+	width: fit-content;
+	text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+	animation: alert-pulse 2.2s ease-in-out infinite;
+}
+
+@keyframes alert-pulse {
+	0%, 100% {
+		box-shadow: 0 2px 10px rgba(244, 63, 94, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.6);
+		transform: scale(1);
+	}
+	50% {
+		box-shadow: 0 2px 16px rgba(244, 63, 94, 0.7), inset 0 1px 1px rgba(255, 255, 255, 0.8);
+		transform: scale(1.02);
+	}
+}
+
+/* System Message */
+.k-system {
+	opacity: 0.9;
+	font-style: italic;
+	border-left-width: 2px !important;
+}
+
+/* ==========================================================================
+   Liquid Avatar Styling
+   ========================================================================== */
+.av {
+	flex-shrink: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.av-box {
+	position: relative;
+	width: var(--avatar-size);
+	height: var(--avatar-size);
+	border-radius: var(--avatar-radius);
+	overflow: hidden;
+	box-shadow: 
+		0 3px 10px rgba(0, 0, 0, 0.4),
+		inset 0 1.2px 1.5px rgba(255, 255, 255, 0.65),
+		0 0 0 1px rgba(255, 255, 255, 0.22);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(255, 255, 255, 0.05);
+	-webkit-backdrop-filter: blur(4px);
+	backdrop-filter: blur(4px);
+	transition: transform 0.2s ease;
+}
+
+.av-box:hover {
+	transform: scale(1.06);
+}
+
+.av-img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+}
+
+.av-fallback {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-family: var(--font-nick);
+	font-weight: 700;
+	font-size: calc(var(--avatar-size) * 0.44);
+	color: #ffffff;
+	text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+	user-select: none;
+}
+
+/* ==========================================================================
+   Card Content Area & Typography
+   ========================================================================== */
+.mess-content {
+	flex: 1 1 auto;
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	z-index: 2;
+}
+
+.mess-header {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 6px;
+	line-height: 1.25;
+	margin-bottom: 2px;
+}
+
+.name {
+	font-family: var(--font-nick);
+	font-size: var(--nick-size);
+	color: var(--nick-color);
+	text-shadow: var(--text-shadow);
+	line-height: 1.2;
+	letter-spacing: 0.2px;
+	white-space: pre-wrap;
+}
+
+/* ==========================================================================
+   Badges & Platform Capsules (Liquid Droplet Pills)
+   ========================================================================== */
+.badges {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	vertical-align: middle;
+}
+
+.badges img {
+	height: 16px;
+	width: auto;
+	max-width: 18px;
+	object-fit: contain;
+	vertical-align: middle;
+	filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6));
+}
+
+.site {
+	display: inline-flex;
+	align-items: center;
+	vertical-align: middle;
+}
+
+.site-pill {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 2px 5px;
+	border-radius: 999px;
+	background: rgba(255, 255, 255, 0.08);
+	-webkit-backdrop-filter: blur(6px);
+	backdrop-filter: blur(6px);
+	border: 1px solid rgba(255, 255, 255, 0.16);
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.25);
+	line-height: 0;
+	transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.site-pill:hover {
+	transform: scale(1.08);
+}
+
+.site-icon,
+.site img {
+	height: 14px;
+	width: auto;
+	max-width: 16px;
+	object-fit: contain;
+	display: block;
+	filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+}
+
+.timestamp {
+	font-size: 11px;
+	color: rgba(255, 255, 255, 0.55);
+	font-family: var(--font-text);
+	margin-left: auto;
+	padding-left: 6px;
+	user-select: none;
+	text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* ==========================================================================
+   Message Body, Emotes, Mentions, Links
+   ========================================================================== */
+.body {
+	font-family: var(--font-text);
+	font-size: var(--text-size);
+	color: var(--text-color);
+	line-height: 1.42;
+	word-break: break-word;
+	text-shadow: var(--text-shadow);
+	letter-spacing: 0.1px;
+}
+
+.user_mess {
+	color: inherit;
+}
+
+.user_mess img {
+	vertical-align: middle;
+	max-height: 28px;
+	width: auto;
+	margin: -2px 3px 0 3px;
+	filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.4));
+	display: inline-block;
+}
+
+.user_mess a {
+	color: var(--link-color);
+	text-decoration: none;
+	font-weight: 500;
+	border-bottom: 1px solid rgba(56, 189, 248, 0.35);
+	transition: border-color 0.2s ease, text-shadow 0.2s ease;
+}
+
+.user_mess a:hover {
+	border-bottom-color: var(--link-color);
+	text-shadow: 0 0 8px rgba(56, 189, 248, 0.6);
+}
+
+/* Mentions styling */
+.user_mess .mention,
+.user_mess b:first-child {
+	color: var(--nick-color);
+}
+
+/* ==========================================================================
+   Smooth Fluid Entrance & Exit Animations
+   ========================================================================== */
+.m-in {
+	animation: liquidIn 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.m-out {
+	animation: liquidOut 0.42s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+	pointer-events: none;
+}
+
+@keyframes liquidIn {
+	0% {
+		opacity: 0;
+		transform: translateY(22px) scale(0.95);
+		filter: blur(4px);
+	}
+	65% {
+		opacity: 0.95;
+		filter: blur(0px);
+	}
+	100% {
+		opacity: 1;
+		transform: translateY(0) scale(1);
+		filter: blur(0);
+	}
+}
+
+@keyframes liquidOut {
+	0% {
+		opacity: 1;
+		transform: translateY(0) scale(1);
+		max-height: 300px;
+		margin-bottom: 0px;
+	}
+	50% {
+		opacity: 0.2;
+		transform: translateY(-8px) scale(0.96);
+	}
+	100% {
+		opacity: 0;
+		transform: translateY(-16px) scale(0.92);
+		max-height: 0px;
+		padding-top: 0px;
+		padding-bottom: 0px;
+		margin-bottom: -10px;
+		border-width: 0px;
+	}
+}
+
+/* ==========================================================================
+   Interactive Standalone Browser Test Controller (Demo Bar)
+   ========================================================================== */
+#demo-bar {
+	position: fixed;
+	top: 14px;
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 9999;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 8px 14px;
+	background: rgba(13, 17, 28, 0.85);
+	-webkit-backdrop-filter: blur(16px);
+	backdrop-filter: blur(16px);
+	border: 1px solid rgba(255, 255, 255, 0.18);
+	border-top: 1px solid rgba(255, 255, 255, 0.4);
+	border-radius: 999px;
+	box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.25);
+	font-family: var(--font-nick);
+	font-size: 13px;
+	color: #fff;
+	transition: opacity 0.25s ease, transform 0.25s ease;
+	user-select: none;
+}
+
+#demo-bar.hidden {
+	opacity: 0;
+	pointer-events: none;
+	transform: translate(-50%, -20px);
+}
+
+.demo-title {
+	font-weight: 700;
+	color: #38bdf8;
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding-right: 4px;
+}
+
+.demo-btn {
+	background: rgba(255, 255, 255, 0.08);
+	border: 1px solid rgba(255, 255, 255, 0.15);
+	border-radius: 999px;
+	color: #f1f5f9;
+	padding: 5px 12px;
+	font-family: inherit;
+	font-size: 12px;
+	font-weight: 600;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	transition: all 0.2s ease;
+	outline: none;
+}
+
+.demo-btn:hover {
+	background: rgba(56, 189, 248, 0.22);
+	border-color: rgba(56, 189, 248, 0.5);
+	color: #fff;
+	transform: translateY(-1px);
+	box-shadow: 0 3px 10px rgba(56, 189, 248, 0.25);
+}
+
+.demo-btn:active {
+	transform: translateY(0);
+}
+
+.demo-btn.active {
+	background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+	border-color: #7dd3fc;
+	color: #04101d;
+	font-weight: 700;
+	box-shadow: 0 0 14px rgba(56, 189, 248, 0.5);
+}
+
+.demo-select {
+	background: rgba(15, 23, 42, 0.9);
+	border: 1px solid rgba(255, 255, 255, 0.2);
+	border-radius: 999px;
+	color: #f8fafc;
+	padding: 4px 10px;
+	font-family: inherit;
+	font-size: 12px;
+	cursor: pointer;
+	outline: none;
+}
+
+.demo-select:focus {
+	border-color: #38bdf8;
+}
+
+.demo-close {
+	background: transparent;
+	border: none;
+	color: rgba(255, 255, 255, 0.45);
+	cursor: pointer;
+	font-size: 15px;
+	padding: 0 4px;
+	line-height: 1;
+	transition: color 0.2s ease;
+}
+
+.demo-close:hover {
+	color: #ff6b81;
+}
